@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Breed Guessing Game</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        
+        h1 {
+          text-align: center;
+        }
+        
+        form {
+          margin-top: 20px;
+        }
+        
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+        
+        select {
+          display: block;
+          margin-bottom: 10px;
+          padding: 5px;
+          font-size: 16px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        
+        button {
+          display: block;
+          margin: 0 auto;
+          padding: 10px;
+          background-color: #4CAF50;
+          color: white;
+          font-size: 16px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        
+        button:hover {
+          background-color: #3e8e41;
+        }
+        
+        img {
+          display: block;
+          margin: 0 auto;
+          margin-top: 20px;
+          max-width: 500px;
+          max-height: 500px;
+        }
+        
+        p {
+          text-align: center;
+          font-size: 20px;
+          margin-top: 10px;
+        }
+      </style>
+  </head>
+  <body>
+    <h1>Cat Breed Guessing Game</h1>
+    <img id="cat-image" src="" alt="Cat Image">
+    <form>
+      <label for="breed-select">Select the breed of this cat:</label>
+      <select id="breed-select">
+      </select>
+      <br>
+      <button type="button" onclick="checkAnswer()">Check Answer</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+      const apiUrl = "https://api.thecatapi.com/v1/images/search?size=full&breed_id=";
+      const breedSelect = document.getElementById("breed-select");
+      const catImage = document.getElementById("cat-image");
+      const resultElement = document.getElementById("result");
+      let correctBreedId;
+
+      async function getBreeds() {
+        const response = await fetch("https://api.thecatapi.com/v1/breeds");
+        const data = await response.json();
+        for (let i = 0; i < data.length; i++) {
+          const breed = data[i];
+          const option = document.createElement("option");
+          option.value = breed.id;
+          option.text = breed.name;
+          breedSelect.appendChild(option);
+        }
+      }
+
+      async function getNewCat() {
+        resultElement.textContent = "";
+        const randomIndex = Math.floor(Math.random() * breedSelect.options.length);
+        const breedId = breedSelect.options[randomIndex].value;
+        correctBreedId = breedId;
+        const response = await fetch(apiUrl + breedId);
+        const data = await response.json();
+        catImage.src = data[0].url;
+      }
+
+      function checkAnswer() {
+        const selectedBreedId = breedSelect.value;
+        if (selectedBreedId === correctBreedId) {
+          resultElement.textContent = "Correct!";
+        } else {
+          resultElement.textContent = "Incorrect! The correct answer is " + breedSelect.options[breedSelect.selectedIndex].text;
+        }
+      }
+
+      getBreeds();
+      getNewCat();
+    </script>
+  </body>
+</html>
